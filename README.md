@@ -16,6 +16,20 @@ qmlmaya is Maya module that can be installed like all other Maya modules.  You c
 * Add the qmlmaya root directory to the MAYA_MODULE_PATH in your Maya.env.  e.g.  MAYA_MODULE_PATH += /path/to/qmlmaya
 * Edit the qmlmaya.mod file, and replace the ./ with the full path to the qmlmaya root directory, then copy the qmlmaya.mod file to where your modules are loaded from.
 
+# Usage
+
+```
+import os
+from qmlmaya import QuickWindow
+
+window = QuickWindow()
+qml_file = os.path.join(os.path.dirname(__file__), "gallery.qml")
+window.setSource(qml_file)
+window.setWindowTitle("Qt Quick Controls 2")
+
+window.show()
+```
+
 # Running the Examples
 If you don't need the examples, you can delete the scripts/qmlmaya_examples directory
 
