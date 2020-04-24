@@ -6,7 +6,6 @@ import logging
 import os
 from six import string_types
 
-from PySide2 import QtCore
 from PySide2.QtQuick import QQuickView
 from PySide2.QtCore import Qt, QUrl
 from PySide2.QtWidgets import QWidget, QMainWindow
@@ -20,6 +19,7 @@ class QuickWindow(MayaQWidgetBaseMixin, QMainWindow):
     def __init__(self, url=None, *args, **kwargs):
         super(QuickWindow, self).__init__(*args, **kwargs)
         self.view = QQuickView()
+        self.view.statusChanged.connect(self.onStatusChanged)
         self.widget = None
         if url:
             self.setSource(url)
@@ -48,25 +48,10 @@ class QuickWindow(MayaQWidgetBaseMixin, QMainWindow):
         self.setCentralWidget(self.widget)
         self.setFocusProxy(self.widget)
         self.resize(size)
-        self.view.rootObject()
 
-
-def qt_message_handler(mode, context, message):
-    """Log any errors from QML.
-
-    By default, errors in the QML processing will be hidden. Installing this message
-    handler allows us to see those errors
-    """
-    func = {
-        QtCore.QtInfoMsg: logging.info,
-        QtCore.QtWarningMsg: logging.warning,
-        QtCore.QtCriticalMsg: logging.critical,
-        QtCore.QtFatalMsg: logging.fatal,
-        QtCore.QtDebugMsg: logging.debug,
-    }[mode]
-    func("{} ({}:{}, {})".format(message, context.file, context.line, context.file))
-
-
-def setup():
-    QtCore.qInstallMessageHandler(qt_message_handler)
+    def onStatusChanged(self, status):
+        if status == QQuickView.Error:
+            errors = self.view.errors()
+            for error in errors:
+                logging.critical(error)
 

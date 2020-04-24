@@ -52,6 +52,35 @@
 import os
 from qmlmaya import QuickWindow
 
+from PySide2.QtCore import Qt, QUrl, Signal, Slot, QObject, Property
+import maya.cmds as cmds
+
+
+class Backend(QObject):
+    """Example backend object interacting with Maya"""
+    value_changed = Signal(float)
+
+    def __init__(self, parent=None):
+        super(Backend, self).__init__(parent)
+        self._value = 0
+
+    @Property(float, notify=value_changed)
+    def value(self):
+        return self._value
+
+    @value.setter
+    def set_value(self, value):
+        if self._value == value:
+            return
+        self._value = value
+        self.value_changed.emit(self._value)
+
+
+def on_value_change(value):
+    if not cmds.objExists("pCube1"):
+        cmds.polyCube()
+    cmds.setAttr("pCube1.s", value, value, value)
+
 
 def show():
     window = QuickWindow()
@@ -60,6 +89,10 @@ def show():
     # settings the source
     import_path = os.path.join(os.path.dirname(__file__), "imports")
     window.addImportPath(import_path)
+
+    window.backend = Backend()
+    window.setContextProperty("backend", window.backend)
+    window.backend.value_changed.connect(on_value_change)
 
     qml_file = os.path.join(os.path.dirname(__file__), "flatstyle.qml")
     window.setSource(qml_file)

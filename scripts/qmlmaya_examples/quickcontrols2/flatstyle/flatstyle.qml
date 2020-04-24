@@ -70,7 +70,8 @@ Page {
         sizeSwitch.onCheckedChanged: Theme.baseSize = (sizeSwitch.checked ? Theme.largeSize : Theme.smallSize)
         checkBoxBold.onCheckedChanged: Theme.font.bold = checkBoxBold.checked
         checkBoxUnderline.onCheckedChanged: Theme.font.underline = checkBoxUnderline.checked
-        slider.onPositionChanged: Theme.font.pixelSize = slider.valueAt(slider.position)
+        //slider.onPositionChanged: Theme.font.pixelSize = slider.valueAt(slider.position)
+        slider.onPositionChanged: backend.value = slider.valueAt(slider.position)
     }
 
     ColorDialog {
